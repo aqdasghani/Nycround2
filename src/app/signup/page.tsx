@@ -51,7 +51,7 @@ export default function SignupPage() {
           </Link>
           
           <h2 className="font-display text-xl font-bold text-[#202124]">
-            Create your TubeFlow Account
+            Create your Quick Reply Account
           </h2>
           <p className="text-xs text-slate-500 mt-1">
             to connect your YouTube channels and manage automation

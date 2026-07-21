@@ -21,7 +21,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TubeFlow — YouTube Comment Auto-Reply Automation",
+  title: "Quick Reply — YouTube Comment Auto-Reply Automation",
   description: "Monitor and automate YouTube comment replies in real-time with smart keyword rules.",
 };
 

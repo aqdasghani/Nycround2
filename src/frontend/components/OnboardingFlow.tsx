@@ -30,7 +30,7 @@ export default function OnboardingFlow() {
   // First Rule Data
   const [ruleName, setRuleName] = useState("Pricing Keywords");
   const [keywords, setKeywords] = useState("price, cost, how much");
-  const [replyBody, setReplyBody] = useState("Hey {{commenter_name}}! Thanks for asking. Our basic package is $29/mo. Check details at https://tubeflow.com/pricing! 👋");
+  const [replyBody, setReplyBody] = useState("Hey {{commenter_name}}! Thanks for asking. Our basic package is $29/mo. Check details at https://Quick Reply.com/pricing! 👋");
 
 
 
@@ -132,7 +132,7 @@ export default function OnboardingFlow() {
             delaySeconds: 180,
             dailyLimit: 50,
             colorLabel: "red",
-            customVariable1: "https://tubeflow.com/pricing"
+            customVariable1: "https://Quick Reply.com/pricing"
           })
         });
 
@@ -210,7 +210,7 @@ export default function OnboardingFlow() {
                   Connect your YouTube Channel
                 </h2>
                 <p className="text-sm text-slate-500 mt-2">
-                  Allow TubeFlow to monitor comments and post replies automatically using secure, official Google OAuth integrations.
+                  Allow Quick Reply to monitor comments and post replies automatically using secure, official Google OAuth integrations.
                 </p>
               </div>
 
@@ -455,9 +455,9 @@ export default function OnboardingFlow() {
                       </p>
                       
                       <div className="bg-slate-50 rounded-lg p-2.5 border border-slate-100 text-xs">
-                        <div className="text-[10px] font-bold text-google-blue mb-1">TubeFlow Auto-Response:</div>
+                        <div className="text-[10px] font-bold text-google-blue mb-1">Quick Reply Auto-Response:</div>
                         <p className="text-slate-700 italic">
-                          &ldquo;Hey Mickey Mouse! Thanks for asking. Our basic package is $29/mo. Check details at https://tubeflow.com/pricing! 👋&rdquo;
+                          &ldquo;Hey Mickey Mouse! Thanks for asking. Our basic package is $29/mo. Check details at https://Quick Reply.com/pricing! 👋&rdquo;
                         </p>
                       </div>
                     </div>

@@ -130,8 +130,8 @@ export default function DashboardOverviewPage() {
     );
   }
 
-  const maxQuota = userSession?.tier === "premium" ? 200 : 0;
-  const usagePercentage = maxQuota === 0 ? 100 : Math.min(100, Math.round(((userSession?.repliesToday || 0) / maxQuota) * 100));
+  const maxQuota = 200;
+  const usagePercentage = Math.min(100, Math.round(((userSession?.repliesToday || 0) / maxQuota) * 100));
 
   return (
     <div className="space-y-6 text-left font-sans">
@@ -150,18 +150,11 @@ export default function DashboardOverviewPage() {
         <div className="rounded-xl border border-[#dadce0] bg-white p-4.5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 bg-google-blue-light border border-blue-150 rounded-lg flex items-center justify-center text-google-blue text-lg shrink-0">
-              {userSession.tier === "premium" ? "👑" : "👤"}
+              👤
             </div>
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 <span className="font-bold text-slate-800 text-sm">{userSession.name}</span>
-                <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider
-                  ${userSession.tier === "premium" 
-                    ? "bg-purple-100 text-purple-800 border border-purple-200" 
-                    : "bg-slate-100 text-slate-700 border border-slate-200"}
-                `}>
-                  {userSession.tier} Plan
-                </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-slate-500 font-medium">
@@ -181,30 +174,7 @@ export default function DashboardOverviewPage() {
             </div>
           </div>
 
-          {/* Coupon Redemption Option */}
-          {userSession.tier !== "premium" ? (
-            <form onSubmit={handleRedeemCoupon} className="flex items-center gap-2 shrink-0">
-              <input
-                type="text"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
-                placeholder="Enter Coupon Code"
-                className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs outline-none focus:border-google-blue w-40 text-slate-800"
-                required
-              />
-              <button
-                type="submit"
-                disabled={redeeming}
-                className="rounded-lg bg-google-blue hover:bg-google-blue-pressed text-white text-xs font-semibold px-4 py-1.5 transition active:scale-95 disabled:opacity-50"
-              >
-                {redeeming ? "Redeeming..." : "Redeem"}
-              </button>
-            </form>
-          ) : (
-            <div className="flex items-center gap-1 text-accent-success text-xs font-bold shrink-0">
-              <span>✓ Premium Active</span>
-            </div>
-          )}
+
         </div>
       )}
 

@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
-interface toastState {
+interface ToastState {
   message: string;
-  type: "success" | "error" | "info" | null;
+  type: "success" | "error" | "warning" | "info";
 }
 
 interface UIState {

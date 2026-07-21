@@ -100,9 +100,7 @@ export default function Sidebar() {
               <span className="font-display text-sm font-semibold tracking-wide">
                 {workspaceName}
               </span>
-              <span className="text-[10px] text-slate-400 font-medium">
-                {userSession?.tier === "premium" ? "Premium Plan" : "Free Plan"}
-              </span>
+
             </div>
           </div>
           <ChevronDown className="h-4 w-4 shrink-0 text-slate-400 lg:block md:hidden" />
