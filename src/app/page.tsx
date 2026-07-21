@@ -100,10 +100,15 @@ export default function Home() {
           </div >
 
           <div className='herosection grid grid-cols-1 md:grid-cols-2 gap-20 items-center px-10 py-16'>
-            <div className='left-div flex flex-col gap-6'>
-              <h1 className='heading-font text-4xl font-bold italic text-zinc-900 leading-none'>Meet QuickReply !</h1>
-              <p className='text-lg text-zinc-900 leading-6 max-w-xl body-font'>
-                Automate YouTube comment replies with customisable keyword rules. Save time, engage your audience instantly, and never miss repitive questions again.
+            <div className='left-div flex flex-col gap-7'>
+              <div className='flex flex-col gap-1'>
+                <span className='body-font text-sm font-semibold tracking-widest text-amber-600 uppercase'>YouTube Automation</span>
+                <h1 className='heading-font text-5xl md:text-6xl font-black italic text-zinc-900 leading-tight'>
+                  Meet <span style={{background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #92400E 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text'}}>QuickReply</span>
+                </h1>
+              </div>
+              <p className='text-lg md:text-xl text-zinc-600 leading-relaxed max-w-lg body-font font-light'>
+                Automate YouTube comment replies with customisable keyword rules. Save time, engage your audience instantly, and never miss repetitive questions again.
               </p>
             </div>
 
