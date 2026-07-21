@@ -21,7 +21,7 @@ import {
 
 interface Condition {
   id: string;
-  type: "contains" | "equals" | "starts_with";
+  type: "contains" | "equals" | "starts_with" | "reply_all";
   value: string;
 }
 
