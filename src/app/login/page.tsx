@@ -29,7 +29,7 @@ export default function LoginPage() {
         {/* Login Options */}
         <div className='w-full flex flex-col gap-4 mt-6'>
           <button 
-            onClick={() => router.push('/dashboard')}
+            onClick={() => window.location.href = '/api/auth/google?login=true'}
             className='w-full bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-800 font-semibold py-3 px-4 rounded-full flex items-center justify-center gap-3 transition-colors shadow-sm cursor-pointer'
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
