@@ -34,9 +34,6 @@ export default function OnboardingFlow() {
 
 
 
-  // Simulation Comment State for Step 3
-  const [simState, setSimState] = useState<"idle" | "countdown" | "replied">("idle");
-  const [simTimer, setSimTimer] = useState(5);
 
   // Check query parameters for success return from OAuth
   useEffect(() => {
@@ -138,7 +135,7 @@ export default function OnboardingFlow() {
 
         showToast("Auto-reply rule saved!", "success");
         triggerRefresh();
-        setStep(3);
+        handleFinishOnboarding();
       }
     } catch (err) {
       console.error("Save rule error:", err);
@@ -147,21 +144,7 @@ export default function OnboardingFlow() {
     }
   };
 
-  const runSimulation = () => {
-    setSimState("countdown");
-    setSimTimer(5);
-    const interval = setInterval(() => {
-      setSimTimer((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          setSimState("replied");
-          showToast("Simulation completed successfully!", "success");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
+
 
 
 
@@ -185,10 +168,9 @@ export default function OnboardingFlow() {
           <div className="flex items-center gap-1.5">
             <span className={dotClass(1)} />
             <span className={dotClass(2)} />
-            <span className={dotClass(3)} />
           </div>
           <span className="text-xs font-semibold text-slate-500 font-display">
-            STEP {step} OF 3
+            STEP {step} OF 2
           </span>
         </div>
 
@@ -361,7 +343,7 @@ export default function OnboardingFlow() {
                     </>
                   ) : (
                     <>
-                      Save & Test Rule
+                      Save & Finish
                       <ArrowRight className="h-3.5 w-3.5" />
                     </>
                   )}
@@ -370,119 +352,7 @@ export default function OnboardingFlow() {
             </motion.div>
           )}
 
-          {step === 3 && (
-            <motion.div
-              key="step-3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-6"
-            >
-              <div className="text-center">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-50 text-accent-success border border-green-200">
-                  <Sparkles className="h-7 w-7 animate-bounce" />
-                </div>
-                <h2 className="font-display text-xl font-bold text-[#202124]">
-                  Watch Replies Happen (Live Demo)
-                </h2>
-                <p className="text-sm text-slate-500 mt-1">
-                  See how an incoming comment triggers a delayed auto-reply automatically.
-                </p>
-              </div>
 
-              {/* Simulation visual canvas */}
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 min-h-[160px] text-left flex flex-col justify-center">
-                {simState === "idle" && (
-                  <div className="text-center py-4">
-                    <button
-                      onClick={runSimulation}
-                      className="inline-flex items-center gap-2 rounded-full bg-google-blue hover:bg-google-blue-pressed px-5 py-2 text-xs font-semibold text-white shadow-sm transition"
-                    >
-                      <Play className="h-3.5 w-3.5" />
-                      Simulate Incoming Comment
-                    </button>
-                  </div>
-                )}
-
-                {simState === "countdown" && (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-accent-live live-pulse" />
-                        <span className="text-[10px] font-semibold text-accent-live uppercase tracking-wider">🔴 Incoming Live Comment</span>
-                      </div>
-                      <span className="text-[11px] font-medium text-slate-400">Ticking down...</span>
-                    </div>
-
-                    <div className="bg-white rounded-lg border border-slate-200 p-3 shadow-sm">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <div className="h-5 w-5 bg-blue-100 rounded-full flex items-center justify-center text-[10px] font-bold text-google-blue">M</div>
-                        <span className="text-xs font-bold text-slate-800">Mickey Mouse</span>
-                        <span className="text-[10px] text-slate-400">• Just now</span>
-                      </div>
-                      <p className="text-xs text-slate-600 font-medium italic mb-2">
-                        &ldquo;How much does the workspace subscription cost per month?&rdquo;
-                      </p>
-                      
-                      <div className="flex items-center justify-between border-t border-slate-100 pt-2 text-[10px] text-slate-500">
-                        <span className="font-semibold text-accent-success bg-green-50 px-1.5 py-0.5 rounded border border-green-100">
-                          Matched Rule: Pricing Keywords
-                        </span>
-                        <span className="font-semibold text-accent-live">
-                          Firing reply in {simTimer}s
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {simState === "replied" && (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-semibold text-accent-success uppercase tracking-wider">✅ Auto-Reply Dispatched</span>
-                      <span className="text-[11px] font-medium text-slate-400">Success</span>
-                    </div>
-
-                    <div className="bg-white rounded-lg border border-green-200 p-3 shadow-sm">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <div className="h-5 w-5 bg-blue-100 rounded-full flex items-center justify-center text-[10px] font-bold text-google-blue">M</div>
-                        <span className="text-xs font-bold text-slate-800">Mickey Mouse</span>
-                        <span className="text-[10px] text-slate-400">• 5s ago</span>
-                      </div>
-                      <p className="text-xs text-slate-500 italic mb-2">
-                        &ldquo;How much does the workspace subscription cost per month?&rdquo;
-                      </p>
-                      
-                      <div className="bg-slate-50 rounded-lg p-2.5 border border-slate-100 text-xs">
-                        <div className="text-[10px] font-bold text-google-blue mb-1">Quick Reply Auto-Response:</div>
-                        <p className="text-slate-700 italic">
-                          &ldquo;Hey Mickey Mouse! Thanks for asking. Our basic package is $29/mo. Check details at https://Quick Reply.com/pricing! 👋&rdquo;
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex justify-between items-center pt-4 border-t border-slate-100">
-                <button
-                  onClick={() => setStep(2)}
-                  className="text-xs font-semibold text-slate-400 hover:text-slate-600"
-                >
-                  Back
-                </button>
-                <button
-                  disabled={simState !== "replied"}
-                  onClick={handleFinishOnboarding}
-                  className="inline-flex items-center gap-1 rounded-full bg-google-blue hover:bg-google-blue-pressed text-xs font-semibold text-white px-5 py-2 disabled:opacity-50 transition"
-                >
-                  Go to Dashboard
-                  <CheckCircle className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            </motion.div>
-          )}
 
 
         </AnimatePresence>

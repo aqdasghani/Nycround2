@@ -86,7 +86,7 @@ export interface Template {
 
 export interface RuleCondition {
   id: string;
-  type: "contains" | "equals" | "regex" | "starts_with";
+  type: "contains" | "equals" | "regex" | "starts_with" | "reply_all";
   value: string;
 }
 

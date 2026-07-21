@@ -99,41 +99,60 @@ export default function LiveCommentFeed() {
     calculateStats();
   }, [activeChannelId, refreshTrigger]);
 
-  // Client-side timer ticker interval
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setComments((prevComments) => {
-        let changed = false;
-        const nextComments = prevComments.map((comment) => {
-          if (comment.status === "matched" && comment.delayRemainingSeconds > 0) {
-            changed = true;
-            const nextVal = comment.delayRemainingSeconds - 1;
-            if (nextVal <= 0) {
-              // Trigger sync reload
-              setTimeout(() => {
-                triggerRefresh();
-              }, 100);
+    // Client-side timer ticker interval
+    useEffect(() => {
+      const timer = setInterval(() => {
+        setComments((prevComments) => {
+          let changed = false;
+          const nextComments = prevComments.map((comment) => {
+            if (comment.status === "matched" && comment.delayRemainingSeconds > 0) {
+              changed = true;
+              const nextVal = comment.delayRemainingSeconds - 1;
+              if (nextVal <= 0) {
+                // Trigger sync reload
+                setTimeout(() => {
+                  triggerRefresh();
+                }, 100);
+                return {
+                  ...comment,
+                  status: "replied" as Comment["status"],
+                  delayRemainingSeconds: 0,
+                  replyFiredAt: new Date().toISOString()
+                };
+              }
               return {
                 ...comment,
-                status: "replied" as Comment["status"],
-                delayRemainingSeconds: 0,
-                replyFiredAt: new Date().toISOString()
+                delayRemainingSeconds: nextVal
               };
             }
-            return {
-              ...comment,
-              delayRemainingSeconds: nextVal
-            };
-          }
-          return comment;
+            return comment;
+          });
+  
+          return nextComments;
         });
-
-        return nextComments;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [triggerRefresh]);
+      }, 1000);
+  
+      return () => clearInterval(timer);
+    }, [triggerRefresh]);
+    
+    // Auto-poll YouTube comments every 30 seconds
+    useEffect(() => {
+      const pollTimer = setInterval(async () => {
+        try {
+          const res = await fetch("/api/youtube/poll");
+          if (res.ok) {
+            triggerRefresh(); // Refresh feed after polling
+          }
+        } catch (err) {
+          console.error("Auto-polling failed", err);
+        }
+      }, 30000); // 30 seconds
+      
+      // Run once immediately on mount
+      fetch("/api/youtube/poll").then(() => triggerRefresh()).catch(() => {});
+      
+      return () => clearInterval(pollTimer);
+    }, [triggerRefresh]);
 
   const handleSendNow = async (commentId: string, replyText: string) => {
     try {
@@ -182,17 +201,7 @@ export default function LiveCommentFeed() {
     }
   };
 
-  const triggerForceSpawn = async () => {
-    showToast("Simulating a new comment trigger...", "info");
-    try {
-      const res = await fetch(`/api/comments?forceSpawn=true`);
-      if (res.ok) {
-        triggerRefresh();
-      }
-    } catch (err) {
-      console.error("Error spawning comment:", err);
-    }
-  };
+
 
   const formatTimer = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -217,15 +226,6 @@ export default function LiveCommentFeed() {
             <span className="h-2 w-2 rounded-full bg-accent-live live-pulse" />
             <span>● LIVE ACTIVITY</span>
           </div>
-          
-          <button
-            onClick={triggerForceSpawn}
-            className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 hover:bg-slate-200 px-3 py-1.5 text-[11px] font-semibold text-slate-700 border border-slate-200 transition active:scale-95 cursor-pointer"
-            title="Inject a simulated YouTube comment immediately"
-          >
-            <Sparkles className="h-3 w-3 text-google-blue" />
-            Simulate Comment
-          </button>
         </div>
 
         {/* Real-time Stats */}
@@ -283,7 +283,7 @@ export default function LiveCommentFeed() {
             <Youtube className="h-10 w-10 text-slate-300 mb-2" />
             <h4 className="text-sm font-bold text-slate-700">No comments found</h4>
             <p className="text-xs text-slate-500 mt-1 max-w-[280px]">
-              No comments matches this tab filter. Wait for live polling or click &ldquo;Simulate Comment&rdquo;.
+              No comments match this tab filter. Wait for live polling.
             </p>
           </div>
         ) : (
