@@ -40,13 +40,8 @@ export default function Home() {
 
   return (
     <>
-<<<<<<< HEAD:src/app/page.tsx
       <div className='bg-amber-100 min-h-screen'>
         <div className='bg-yellow-300 rounded-3xl m-1.5 w-[97.5vw] min-h-[75vh] md:min-h-[40vh] lg:min-h-[90vh]'>
-=======
-      <div className='bg-amber-100'>
-        <div className='bg-yellow-300 m-0 w-full h-[75vh] md:h-[40vh] lg:h-[90vh]'>
->>>>>>> 5662598927237ef1c9eeb960ffa38d913bab6aff:src/App.jsx
           <div className='w-full flex justify-center pt-8'>
             <nav className='hidden md:flex justify-center navbar mx-auto bg-white rounded-full p-2 px-4 shadow-lg'>
               <div className='flex justify-between gap-10 items-center'>
@@ -104,12 +99,7 @@ export default function Home() {
             )}
           </div >
 
-<<<<<<< HEAD:src/app/page.tsx
           <div className='herosection grid grid-cols-1 md:grid-cols-2 gap-20 items-center px-10 py-16'>
-=======
-
-          <div className='herosection grid grid-cols-1  md:grid-cols-2 gap-20 items-center px-10 py-16'>
->>>>>>> 5662598927237ef1c9eeb960ffa38d913bab6aff:src/App.jsx
             <div className='left-div flex flex-col gap-6'>
               <h1 className='heading-font text-4xl font-bold italic text-zinc-900 leading-none'>Meet QuickReply !</h1>
               <p className='text-lg text-zinc-900 leading-6 max-w-xl body-font'>
