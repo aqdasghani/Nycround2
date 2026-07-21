@@ -6,24 +6,50 @@ import './App.css'
 import younggirl from './assets/younggirl.jpg'
 import { Clock3, MessageCircle, Zap } from 'lucide-react'
 import { Bot } from 'lucide-react'
-
+import { ChevronDown } from 'lucide-react'
 
 function App() {
-  const [count, setCount] = useState(0)
+
+
+  const [openIndex, setOpenIndex] = useState(null)
+
+  const faqs = [
+    {
+      question: "How does ReplyFlow work?",
+      answer:
+        "Create keyword rules, and ReplyFlow automatically replies whenever a matching YouTube comment is detected.",
+    },
+    {
+      question: "Can I customize my replies?",
+      answer:
+        "Yes. You can create unlimited keywords and personalize every automatic response.",
+    },
+    {
+      question: "Does it support multiple YouTube channels?",
+      answer:
+        "Yes. You can connect and manage multiple creator channels from one dashboard.",
+    },
+    {
+      question: "Is ReplyFlow free?",
+      answer:
+        "Our hackathon version is completely free to use.",
+    },
+  ];
+
 
   return (
     <>
       <div className='bg-amber-100'>
         <div className='bg-yellow-300 rounded-3xl m-1.5 w-[97vw] h-[97.5vh]'>
           <div className='w-full flex justify-center pt-8'>
-            <nav className='navbar bg-white rounded-full p-2 px-4 shadow-lg 
-          '>
-              <ul className='flex gap-16 w-full items-center'>
-                <li>Home</li>
-                <li>About</li>
-                <li>Contact</li>
-                <li>
-                  <button className='bg-black text-white px-5 py-2 rounded-full'>Get Started</button>
+            <nav className='navbar bg-white rounded-full p-2 px-4 shadow-lg'>
+              <ul className='flex gap-16 w-full items-center cursor-pointer'>
+                <li className='text-sm font-semibold'>Home</li>
+                <li className='text-sm font-semibold'>About Us</li>
+                <li className='text-sm font-semibold'>Why Us</li>
+                <li className='text-sm font-semibold'>FAQ</li>
+                <li className='text-sm font-semibold'>
+                  <button className='bg-black cursor-pointer text-white px-5 py-2 rounded-full'>Get Started</button>
 
                 </li>
               </ul>
@@ -57,7 +83,7 @@ function App() {
 
         <section className='py-20 px-10'>
 
-          <div className='text-center mb-5'>
+          <div className='text-center mb-5 mt-10'>
             <h1 className='text-zinc-900 heading-font text-4xl font-bold italic'>How it works?</h1>
           </div>
 
@@ -115,7 +141,7 @@ function App() {
             <div className='rounded-3xl bg-[#171717] text-white p-8 hover:scale-100 transition-all duration-300 cursor-pointer'>
               <MessageCircle size={40} />
 
-              <h1 className='text-2xl font-semibold mt-6 heading-font italic'>Auto Replies</h1>
+              <h1 className='text-2xl font-semibold mt-6 heading-font italic'>Auto <br /> Replies</h1>
               <p className='mt-5 text-gray-200 leading-5'>Automatically reply to repititive YouTube comments without manual effort.
               </p>
             </div>
@@ -125,7 +151,7 @@ function App() {
               <Bot size={40} />
 
               <h1 className='text-2xl font-semibold mt-6 heading-font italic'>Keyword Rules</h1>
-              <p className='mt-5 text-black-200 leading-5'>Create your own trigger words and customise replies for every situation.
+              <p className='mt-5 text-black-200 leading-5'>Create custom trigger words and customise replies for every situation.
               </p>
             </div>
 
@@ -135,7 +161,7 @@ function App() {
               <Zap size={40} />
 
               <h1 className='text-2xl font-semibold mt-6 heading-font italic'>Instant Responses</h1>
-              <p className='mt-5 text-black-200 leading-5'>Respond to viewers within seconds and imporve engagement on every upload.
+              <p className='mt-5 text-black-200 leading-5'>Respond to viewers within seconds and keep your audience engageed.
               </p>
             </div>
 
@@ -144,8 +170,8 @@ function App() {
             <div className='rounded-3xl bg-[#F59E0B] text-white p-8 hover:scale-100 transition-all duration-300 cursor-pointer'>
               <Clock3 size={40} />
 
-              <h1 className='text-2xl font-semibold mt-6 heading-font italic'>Save hours</h1>
-              <p className='mt-5 text-gray-200 leading-5'>Let QuickReply handle repitive replies while you focus on creating content.
+              <h1 className='text-2xl font-semibold mt-6 heading-font italic'>Save <br />hours</h1>
+              <p className='mt-5 text-white leading-5'>Save your time while focusing on creating better content.
               </p>
             </div>
 
@@ -153,6 +179,58 @@ function App() {
 
 
         </section>
+
+
+
+
+
+        <section className='faq py-20 px-10'>
+
+          <h1 className='text-zinc-900 heading-font text-4xl font-bold italic text-center mb-5'>FAQ's</h1>
+          <div className='bg-white rounded-2xl shadow-sm mb-4 p-4 hover:shadow-md transition-all'>
+            {
+              faqs.map((faq, index) => (
+                <div
+                  key={index}
+                  className='border-b border-gray-200 py-5 cursor-pointer'
+                  onClick={() =>
+                    setOpenIndex(openIndex === index ? null : index)}
+                    >
+
+                  <div className='flex justify-between items-center'>
+                    <h3 className='text-lg font-semibold'> {faq.question}</h3>
+
+                    <span className='text-2xl'>
+                      {openIndex === index ? "-" : "+"}
+                    </span>
+
+                  </div>
+
+                  {
+                    openIndex === index && (
+                      <p className='mt-4 text-gray-600 leading-7'>
+                        {faq.answer}
+                      </p>
+                    )
+
+                  }
+                </div>
+
+              ))
+            }
+
+
+          </div>
+
+
+
+        </section>
+
+
+
+
+
+        <footer></footer>
 
 
 
