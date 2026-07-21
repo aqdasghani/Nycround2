@@ -4,15 +4,17 @@ import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
 import younggirl from './assets/younggirl.jpg'
-import { Clock3, MessageCircle, Zap } from 'lucide-react'
+import { Clock3, MessageCircle, X, Zap } from 'lucide-react'
 import { Bot } from 'lucide-react'
 import { ChevronDown } from 'lucide-react'
+import { Menu } from 'lucide-react'
 
 
 function App() {
 
 
   const [openIndex, setOpenIndex] = useState(null)
+  const [menuOpen, setmenuOpen] = useState(false)
 
   const faqs = [
     {
@@ -41,31 +43,77 @@ function App() {
   return (
     <>
       <div className='bg-amber-100'>
-        <div className='bg-yellow-300 rounded-3xl m-1.5 w-[97vw] h-[97.5vh]'>
+        <div className='bg-yellow-300 rounded-3xl m-1.5 w-[97.5vw] h-[75vh] md:h-[40vh] lg:h-[90vh]'>
           <div className='w-full flex justify-center pt-8'>
 
-            {/* <div>Quick Reply</div> */}
+            <nav className='hidden md:block navbar mx-auto bg-white rounded-full p-2 px-4 shadow-lg'>
 
-            <nav className='navbar bg-white rounded-full p-2 px-4 shadow-lg'>
-              <ul className='flex gap-16 w-full items-center cursor-pointer'>
-                <li className='text-sm font-semibold'>Home</li>
-                <li className='text-sm font-semibold'>About Us</li>
-                <li className='text-sm font-semibold'>Why Us</li>
-                <li className='text-sm font-semibold'>FAQ</li>
-                <li className='text-sm font-semibold'>
-                  <button className='bg-black cursor-pointer text-white px-5 py-2 rounded-full'>Get Started</button>
+              <div className='flex justify-between gap-10 items-center'>
+                <div className='heading-font text-xl font-bold cursor-pointer'>QuickReply</div>
 
-                </li>
-              </ul>
+                <div>
+                  <ul className='flex gap-16 w-full items-center cursor-pointer'>
+                    <li className='text-sm font-semibold body-font'>Home</li>
+                    <li className='text-sm font-semibold body-font'>About Us</li>
+                    <li className='text-sm font-semibold body-font'>Why Us</li>
+                    <li className='text-sm font-semibold body-font'>FAQ</li>
+                    <li className='text-sm font-semibold body-font'>
+                      <button className='bg-black cursor-pointer text-white px-5 py-2 rounded-full'>Get Started</button>
+
+                    </li>
+                  </ul>
+                </div>
+
+              </div>
+
+
             </nav>
-          </div>
 
 
 
-          <div className='herosection grid grid-cols-2 gap-20 items-center px-10 py-16'>
+            <div className='md:hidden flex justify-between items-center gap-40 px-6 py-5'>
+              <h2 className='text-2xl font-bold heading-font'>QuickReply</h2>
+
+              <button onClick={() => setmenuOpen(!menuOpen)}>
+                {menuOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
+
+            </div>
+
+
+
+            <div className={`'md:hidden overflow-hidden transition-all duration-300 ${menuOpen ? "max-h-96 opacity-100" : 'max-h-0 opacity-0'
+              }'`}>
+
+              <div className='bg-white rounded-2xl mx-3 p-3'>
+                <ul className='flex flex-col gap-5 text-lg font-medium'>
+                  <li> <a href='#home' className='text-sm font-semibold body-font'>Home</a></li>
+                  <li> <a href='#about' className='text-sm font-semibold body-font'>About Us</a></li>
+                  <li> <a href='#why' className='text-sm font-semibold body-font'>Why Us</a></li>
+                  <li> <a href='#faq' className='text-sm font-semibold body-font'>FAQ</a></li>
+
+                  <button className='bg-black cursor-pointer text-white px-5 py-2 rounded-full'>Get Started<a /></button>
+
+                </ul>
+              </div>
+
+
+
+            </div >
+
+
+
+
+
+
+          </div >
+
+
+
+          <div className='herosection = grid grid-cols-1  md:grid-cols-2 gap-20 items-center px-10 py-16'>
             <div className='left-div flex flex-col gap-6'>
               <h1 className='heading-font text-4xl font-bold italic text-zinc-900 leading-none' >Meet QuickReply !</h1>
-              <p className='text-lg text-zinc-900 leading-6 max-w-xl'>
+              <p className='text-lg text-zinc-900 leading-6 max-w-xl body-font'>
                 Automate YouTube comment replies with customisable keyword rules. Save time, engage your audience instantly, and never miss repitive questions again.
 
 
@@ -85,20 +133,20 @@ function App() {
 
 
 
-        <section className='py-20 px-10'>
+        <section id='home' className='py-20 px-10'>
 
           <div className='text-center mb-5 mt-10'>
             <h1 className='text-zinc-900 heading-font text-4xl font-bold italic'>How it works?</h1>
           </div>
 
-          <p className='text-black-600 mt-4 max-w-2xl mx-auto text-center'>Save hours every week by automatically replying to comments using customisable keyword rules</p>
+          <p className='text-black-600 mt-4 max-w-2xl mx-auto text-center body-font'>Save hours every week by automatically replying to comments using customisable keyword rules</p>
 
 
-          <div className='grid grid-cols-2 gap-8 mt-10'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mt-10'>
 
             <div className="rounded-3xl shadow-lg p-8 bg-white">
               <h3 className='text-2xl font-semibold mb-3 heading-font italic'> Auto Replies</h3>
-              <p className='text-gray-600 leading-5'>
+              <p className='text-gray-600 leading-5 body-font'>
                 Automatically reply to repitive comments like "Notes?", "Link?", "Github?"
               </p>
             </div>
@@ -106,7 +154,7 @@ function App() {
 
             <div className="rounded-3xl shadow-lg p-8 bg-white">
               <h3 className='text-2xl font-semibold mb-3 heading-font italic'> Keyword Rules</h3>
-              <p className='text-gray-600 leading-5'>
+              <p className='text-gray-600 leading-5 body-font'>
                 Create your own trigger words and customise the reply that should be sent automatically.
               </p >
             </div>
@@ -114,7 +162,7 @@ function App() {
 
             <div className="rounded-3xl shadow-lg p-8 bg-white">
               <h3 className='text-2xl font-semibold mb-3 heading-font italic'> Instant Responses</h3>
-              <p className='text-gray-600 leading-5'>
+              <p className='text-gray-600 leading-5 body-font'>
                 Keep your audience engaged with quick response instead of replying manually.
               </p >
             </div>
@@ -122,7 +170,7 @@ function App() {
 
             <div className="rounded-3xl shadow-lg p-8 bg-white">
               <h3 className='text-2xl font-semibold mb-3 heading-font italic'>Creator freindly</h3>
-              <p className='text-gray-600 leading-5'>
+              <p className='text-gray-600 leading-5 body-font'>
                 Perfect for creators who recieve hundreds of similar comments everyday.
               </p >
             </div>
@@ -131,22 +179,22 @@ function App() {
         </section >
 
 
-        <section className='py-20 px-10'>
+        <section id='about' className='py-20 px-10'>
 
           <div className='text-center mb-5'>
             <h1 className='text-zinc-900 heading-font text-4xl font-bold italic'>It's capabilites?</h1>
-            <p className='text-black-600 mt-4 max-w-2xl mx-auto text-center'>Everything you need to automate YouTube comments and engage your audience effortlessly.</p>
+            <p className='text-black-600 mt-4 max-w-2xl mx-auto text-center body-font'>Everything you need to automate YouTube comments and engage your audience effortlessly.</p>
           </div>
 
 
 
-          <div className='grid grid-cols-4 gap-4 mt-10'>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-10'>
 
             <div className='rounded-3xl bg-[#171717] text-white p-8 hover:scale-100 transition-all duration-300 cursor-pointer'>
               <MessageCircle size={40} />
 
-              <h1 className='text-2xl font-semibold mt-6 heading-font italic'>Auto <br /> Replies</h1>
-              <p className='mt-5 text-gray-200 leading-5'>Automatically reply to repititive YouTube comments without manual effort.
+              <h1 className='text-2xl font-semibold mt-6 heading-font italic'>Auto <br className='hidden lg:block' /> Replies</h1>
+              <p className='mt-5 text-gray-200 leading-5 body-font'>Automatically reply to repititive YouTube comments without manual effort.
               </p>
             </div>
 
@@ -155,7 +203,7 @@ function App() {
               <Bot size={40} />
 
               <h1 className='text-2xl font-semibold mt-6 heading-font italic'>Keyword Rules</h1>
-              <p className='mt-5 text-black-200 leading-5'>Create custom trigger words and customise replies for every situation.
+              <p className='mt-5 text-black-200 leading-5 body-font'>Create custom trigger words and customise replies for every situation.
               </p>
             </div>
 
@@ -165,7 +213,7 @@ function App() {
               <Zap size={40} />
 
               <h1 className='text-2xl font-semibold mt-6 heading-font italic'>Instant Responses</h1>
-              <p className='mt-5 text-black-200 leading-5'>Respond to viewers within seconds and keep your audience engageed.
+              <p className='mt-5 text-black-200 leading-5 body-font'>Respond to viewers within seconds and keep your audience engaged.
               </p>
             </div>
 
@@ -174,8 +222,8 @@ function App() {
             <div className='rounded-3xl bg-[#F59E0B] text-white p-8 hover:scale-100 transition-all duration-300 cursor-pointer'>
               <Clock3 size={40} />
 
-              <h1 className='text-2xl font-semibold mt-6 heading-font italic'>Save <br />hours</h1>
-              <p className='mt-5 text-white leading-5'>Save your time while focusing on creating better content.
+              <h1 className='text-2xl font-semibold mt-6 heading-font italic'>Save <br className='hidden lg:block' />hours</h1>
+              <p className='mt-5 text-white leading-5 body-font'>Save your time while focusing on creating better content.
               </p>
             </div>
 
@@ -188,9 +236,9 @@ function App() {
 
 
 
-        <section className='faq py-20 px-10'>
+        <section id='faq' className='faq py-20 px-10'>
 
-          <h1 className='text-zinc-900 heading-font text-4xl font-bold italic text-center mb-5'>FAQ's</h1>
+          <h1 className='text-zinc-900 heading-font text-4xl font-bold italic text-center mb-10'>FAQ's</h1>
           <div className='bg-white rounded-2xl shadow-sm mb-4 p-4 hover:shadow-md transition-all'>
             {
               faqs.map((faq, index) => (
@@ -202,7 +250,7 @@ function App() {
                 >
 
                   <div className='flex justify-between items-center'>
-                    <h3 className='text-lg font-semibold'> {faq.question}</h3>
+                    <h3 className='text-lg font-semibold body-font'> {faq.question}</h3>
 
                     <span className='text-2xl'>
                       {openIndex === index ? "-" : "+"}
@@ -212,7 +260,7 @@ function App() {
 
                   {
                     openIndex === index && (
-                      <p className='mt-4 text-gray-600 leading-7'>
+                      <p className='mt-4 text-gray-600 leading-7 body-font'>
                         {faq.answer}
                       </p>
                     )
@@ -235,20 +283,19 @@ function App() {
 
 
         <footer className='bg-black py-8 px-2'>
-          <div className='max-w-5xl mx-auto grid grid-cols-3 gap-16 px-10 text-white'>
+          <div className='max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16 px-10 text-white'>
 
 
             <div className='flex flex-col gap-3'>
-              <h2 className='text-3xl font-bold text-white heading-font'>QuickReply</h2>
-              <p className='text-white text-sm'>
+              <h2 className='text-3xl font-bold text-white heading-font mb-4'>QuickReply</h2>
+              <p className='text-white text-sm body-font'>
                 Automate YouTube comment replies and save hours every week.
               </p>
 
               <div className='flex justify-between items-center gap-4 text-white mt-8'>
-                <h1 className='text-sm cursor-pointer'>Twitter</h1>
-                <h1 className='text-sm cursor-pointer'>Linkedin</h1>
-                <h1 className='text-sm cursor-pointer'>Instagram</h1>
-                <h1 className='text-sm cursor-pointer'>Github</h1>
+                <h1 className='text-sm cursor-pointer body-font'>Twitter</h1>
+                <h1 className='text-sm cursor-pointer body-font'>Linkedin</h1>
+                <h1 className='text-sm cursor-pointer body-font'>Instagram</h1>
               </div>
             </div>
 
@@ -258,9 +305,9 @@ function App() {
               <h3 className='font-bold text-lg'>Product</h3>
 
               <ul className='space-y-4 mt-6 text-white'>
-                <li className='tex-sm cursor-pointer'>Features</li>
-                <li className='tex-sm cursor-pointer'>FAQ</li>
-                <li className='tex-sm cursor-pointer'>Documentation</li>
+                <li className='tex-sm cursor-pointer body-font'>Features</li>
+                <li className='tex-sm cursor-pointer body-font'>FAQ</li>
+                <li className='tex-sm cursor-pointer body-font'>Documentation</li>
 
               </ul>
             </div>
@@ -270,8 +317,8 @@ function App() {
               <h3 className='font-bold text-lg'>Company</h3>
 
               <ul className='space-y-4 mt-6 text-white'>
-                <li className='text-sm cursor-pointer'>About Us</li>
-                <li className='text-sm cursor-pointer'>Contact Us</li>
+                <li className='text-sm cursor-pointer body-font'>About Us</li>
+                <li className='text-sm cursor-pointer body-font'>Contact Us</li>
 
               </ul>
             </div>
@@ -285,7 +332,7 @@ function App() {
 
 
 
-      </div>
+      </div >
     </>
   )
 }
