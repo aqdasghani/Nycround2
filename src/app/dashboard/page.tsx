@@ -1,18 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 import { useUIStore } from "@/frontend/store";
 import { 
   Activity, 
   Target, 
   Clock, 
   CheckCircle, 
-  ArrowRight, 
   Sliders,
-  MessageSquare,
   History,
-  TrendingUp
+  Save
 } from "lucide-react";
 
 interface UserSession {
@@ -31,31 +28,34 @@ export default function DashboardOverviewPage() {
 
   const [kpis, setKpis] = useState<any>(null);
   const [logs, setLogs] = useState<any[]>([]);
-  const [rules, setRules] = useState<any[]>([]);
   const [userSession, setUserSession] = useState<UserSession | null>(null);
+  const [globalConfig, setGlobalConfig] = useState({
+    replyToAll: false,
+    tags: "",
+    template: "Thank you for commenting!"
+  });
+  const [savingConfig, setSavingConfig] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [couponCode, setCouponCode] = useState("");
-  const [redeeming, setRedeeming] = useState(false);
 
   // Fetch KPI, logs, rules, and user tier session
   useEffect(() => {
     async function loadDashboardData() {
       try {
-        const [analRes, setRes, rulesRes] = await Promise.all([
+        const [analRes, setRes] = await Promise.all([
           fetch("/api/analytics"),
-          fetch("/api/settings"),
-          fetch("/api/rules")
+          fetch("/api/settings")
         ]);
 
-        if (analRes.ok && setRes.ok && rulesRes.ok) {
+        if (analRes.ok && setRes.ok) {
           const analData = await analRes.json();
           const setData = await setRes.json();
-          const rulesData = await rulesRes.json();
           
           setKpis(analData.kpis);
           setLogs(setData.activityLogs.slice(0, 5)); // show latest 5
-          setRules(rulesData);
           setUserSession(setData.userSession || null);
+          if (setData.workspace?.settings?.globalReplyConfig) {
+            setGlobalConfig(setData.workspace.settings.globalReplyConfig);
+          }
         }
       } catch (err) {
         console.error("Error fetching dashboard overview data:", err);
@@ -66,50 +66,24 @@ export default function DashboardOverviewPage() {
     loadDashboardData();
   }, [activeChannelId, refreshTrigger]);
 
-  const toggleRuleActive = async (ruleId: string, currentStatus: boolean) => {
+  const handleSaveConfig = async () => {
+    setSavingConfig(true);
     try {
-      const res = await fetch(`/api/rules/${ruleId}`, {
+      const res = await fetch("/api/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isActive: !currentStatus })
+        body: JSON.stringify({ settings: { globalReplyConfig: globalConfig } })
       });
       if (res.ok) {
-        showToast("Rule status toggled", "success");
-        // Reload dashboard state
-        const rulesRes = await fetch("/api/rules");
-        if (rulesRes.ok) {
-          setRules(await rulesRes.json());
-        }
-      }
-    } catch (err) {
-      console.error("Rule toggle error:", err);
-    }
-  };
-
-  const handleRedeemCoupon = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!couponCode.trim()) return;
-    setRedeeming(true);
-    try {
-      const res = await fetch("/api/coupons", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: couponCode })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        showToast(data.message || "Subscription upgraded to Premium!", "success");
-        setCouponCode("");
-        setUserSession(data.userSession);
-        triggerRefresh();
+        showToast("Configuration saved successfully", "success");
       } else {
-        showToast(data.error || "Failed to redeem coupon", "error");
+        showToast("Failed to save configuration", "error");
       }
     } catch (err) {
-      console.error("Redeem error:", err);
-      showToast("Network error redeeming coupon", "error");
+      console.error("Save config error:", err);
+      showToast("Network error saving config", "error");
     } finally {
-      setRedeeming(false);
+      setSavingConfig(false);
     }
   };
 
@@ -225,64 +199,65 @@ export default function DashboardOverviewPage() {
         </div>
       </div>
 
-      {/* 2. Primary Sections: Rules list & Activity logs */}
+      {/* 2. Primary Sections: Global Config & Activity logs */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Active Rules Card */}
+        {/* Global Config Card */}
         <div className="rounded-xl border border-[#dadce0] bg-white p-5 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
               <div className="flex items-center gap-2">
                 <Sliders className="h-5 w-5 text-google-blue shrink-0" />
-                <h4 className="font-display text-sm font-bold text-slate-800">Active Keyword Rules</h4>
+                <h4 className="font-display text-sm font-bold text-slate-800">Global Reply Configuration</h4>
               </div>
-              <Link href="/dashboard/rules" className="text-[11px] font-semibold text-google-blue hover:underline inline-flex items-center gap-0.5">
-                View all <ArrowRight className="h-3 w-3" />
-              </Link>
             </div>
 
-            <div className="space-y-2.5">
-              {rules.map((rule) => (
-                <div key={rule.id} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-150 bg-slate-50/50 text-xs">
-                  <div className="flex items-center gap-2.5 overflow-hidden">
-                    <span className={`h-2.5 w-2.5 rounded-full shrink-0
-                      ${rule.colorLabel === "red" ? "bg-accent-live" : ""}
-                      ${rule.colorLabel === "blue" ? "bg-google-blue" : ""}
-                      ${rule.colorLabel === "yellow" ? "bg-accent-warning" : ""}
-                      ${rule.colorLabel === "green" ? "bg-accent-success" : ""}
-                    `} />
-                    <div className="truncate">
-                      <span className="font-bold text-slate-850 block truncate">{rule.name}</span>
-                      <span className="text-[10px] text-slate-400 truncate block font-medium">
-                        Delay: {Math.round(rule.delaySeconds / 60)} min · Matches: {rule.conditions.map((c: any) => c.value).join(", ")}
-                      </span>
-                    </div>
-                  </div>
+            <div className="space-y-4">
+              <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={globalConfig.replyToAll}
+                  onChange={(e) => setGlobalConfig({ ...globalConfig, replyToAll: e.target.checked })}
+                  className="rounded border-slate-300 text-google-blue focus:ring-google-blue"
+                />
+                Reply to All Comments (Ignores Tags)
+              </label>
 
-                  <button
-                    onClick={() => toggleRuleActive(rule.id, rule.isActive)}
-                    className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out
-                      ${rule.isActive ? "bg-google-blue" : "bg-slate-200"}
-                    `}
-                  >
-                    <span
-                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out
-                        ${rule.isActive ? "translate-x-4" : "translate-x-0"}
-                      `}
-                    />
-                  </button>
+              {!globalConfig.replyToAll && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Tags / Keywords (Comma separated)</label>
+                  <input 
+                    type="text"
+                    value={globalConfig.tags}
+                    onChange={(e) => setGlobalConfig({ ...globalConfig, tags: e.target.value })}
+                    placeholder="e.g. awesome, love it, thanks"
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-google-blue focus:outline-none focus:ring-1 focus:ring-google-blue"
+                  />
                 </div>
-              ))}
+              )}
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wide">Auto-Reply Template</label>
+                <textarea 
+                  value={globalConfig.template}
+                  onChange={(e) => setGlobalConfig({ ...globalConfig, template: e.target.value })}
+                  placeholder="Thank you for commenting!"
+                  rows={3}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-google-blue focus:outline-none focus:ring-1 focus:ring-google-blue resize-none"
+                />
+                <p className="text-[10px] text-slate-400">Available tokens: {"{{commenter_name}}, {{video_title}}, {{reply_date}}"}</p>
+              </div>
             </div>
           </div>
 
           <div className="border-t border-slate-100 pt-3.5 mt-4">
-            <Link 
-              href="/dashboard/rules/new"
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-google-blue hover:bg-google-blue-pressed py-2 text-xs font-semibold text-white transition active:scale-98 shadow-sm"
+            <button 
+              onClick={handleSaveConfig}
+              disabled={savingConfig}
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-google-blue hover:bg-google-blue-pressed py-2 text-xs font-semibold text-white transition active:scale-98 shadow-sm disabled:opacity-50"
             >
-              <Sliders className="h-4 w-4" />
-              Configure New Rule
-            </Link>
+              <Save className="h-4 w-4" />
+              {savingConfig ? "Saving..." : "Save Configuration"}
+            </button>
           </div>
         </div>
 
@@ -294,14 +269,10 @@ export default function DashboardOverviewPage() {
                 <History className="h-5 w-5 text-google-blue shrink-0" />
                 <h4 className="font-display text-sm font-bold text-slate-800">Workspace Activity Audit</h4>
               </div>
-              
-              <Link href="/dashboard/settings" className="text-[11px] font-semibold text-google-blue hover:underline inline-flex items-center gap-0.5">
-                Full logs <ArrowRight className="h-3 w-3" />
-              </Link>
             </div>
 
             <div className="space-y-3">
-              {logs.map((log) => (
+              {logs.length > 0 ? logs.map((log) => (
                 <div key={log.id} className="flex gap-2.5 text-xs text-slate-650 items-start">
                   <div className="h-2 w-2 rounded-full bg-slate-300 mt-1.5 shrink-0" />
                   <div className="flex-1 min-w-0">
@@ -313,18 +284,10 @@ export default function DashboardOverviewPage() {
                     </span>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <p className="text-sm text-slate-500">No recent activity.</p>
+              )}
             </div>
-          </div>
-
-          <div className="border-t border-slate-100 pt-3.5 mt-4">
-            <Link 
-              href="/dashboard/feed"
-              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-google-blue text-google-blue hover:bg-blue-50 py-2 text-xs font-semibold transition active:scale-98 shadow-sm"
-            >
-              <MessageSquare className="h-4 w-4" />
-              Open Live Feed
-            </Link>
           </div>
         </div>
       </div>

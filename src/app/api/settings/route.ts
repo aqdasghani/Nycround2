@@ -18,7 +18,10 @@ export async function PUT(req: NextRequest) {
     if (body.settings) {
       db.workspace.settings = {
         ...db.workspace.settings,
-        ...body.settings
+        ...body.settings,
+        globalReplyConfig: body.settings.globalReplyConfig 
+          ? { ...db.workspace.settings.globalReplyConfig, ...body.settings.globalReplyConfig }
+          : db.workspace.settings.globalReplyConfig
       };
     }
 

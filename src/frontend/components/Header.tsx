@@ -182,11 +182,7 @@ export default function Header() {
               </div>
             </div>
           )}
-          <span className="text-[#dadce0] text-[10px]">•</span>
-          <div className="flex items-center gap-1 text-[11px] font-medium text-[#5f6368]">
-            <Activity className="h-3.5 w-3.5 text-google-blue" />
-            <span>API Quota: <span className="font-semibold text-slate-800">92%</span></span>
-          </div>
+
           <span className="text-[#dadce0] text-[10px]">•</span>
           <span className="text-[11px] font-medium text-accent-success flex items-center gap-1">
             <span className="h-1.5 w-1.5 rounded-full bg-accent-success live-pulse" />

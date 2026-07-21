@@ -60,3 +60,6 @@ Go to your Netlify Project Settings ➡️ **Environment variables** and configu
 * **Database**: MongoDB Node Driver + Local Files JSON adapter
 * **Icons & Charts**: Lucide React + Recharts
 * **State Management**: Zustand
+
+## where we use ai 
+1.In backend createting , rule builder 

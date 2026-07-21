@@ -52,55 +52,8 @@ export async function GET(req: NextRequest) {
     let skippedCount = 0;
     let limitReached = false;
 
-    // 1. Process any existing delayed comments
+    // 1. Delayed comments processing removed for simplicity
     const now = Date.now();
-    for (let i = 0; i < db.comments.length; i++) {
-      const comment = db.comments[i];
-      if (comment.status === "matched") {
-        const rule = db.rules.find((r) => r.id === comment.matchedRuleId);
-        const delaySeconds = rule ? rule.delaySeconds : 180;
-        const matchedTime = comment.matchedAt ? new Date(comment.matchedAt).getTime() : now;
-        const elapsed = Math.floor((now - matchedTime) / 1000);
-        const remaining = Math.max(0, delaySeconds - elapsed);
-
-        if (remaining <= 0) {
-          // Check limits before firing delayed reply
-          if (activeUser.repliesToday >= maxDailyLimit) {
-            limitReached = true;
-            db.comments[i] = {
-              ...comment,
-              status: "failed",
-              delayRemainingSeconds: 0,
-              autoReplyText: "Daily reply quota limit reached for this account."
-            };
-            continue;
-          }
-
-          // Time is up! Post reply
-          const success = await postCommentReply(comment.channelId, comment.id, comment.autoReplyText || "");
-          if (success) {
-            db.comments[i] = {
-              ...comment,
-              status: "replied",
-              delayRemainingSeconds: 0,
-              replyFiredAt: new Date().toISOString()
-            };
-            activeUser.repliesToday++;
-            repliedCount++;
-            await logActivity("System", `Auto-replied (delayed match) to ${comment.author}. Rule: '${rule?.name || "Unknown"}'`);
-          } else {
-            db.comments[i] = {
-              ...comment,
-              status: "failed",
-              delayRemainingSeconds: 0,
-              autoReplyText: "Failed to post comment reply after delay."
-            };
-          }
-        } else {
-          db.comments[i].delayRemainingSeconds = remaining;
-        }
-      }
-    }
 
     // 2. Iterate through all connected channels and fetch fresh comments
     for (const channel of channels) {
@@ -162,24 +115,23 @@ export async function GET(req: NextRequest) {
             continue;
           }
 
-          // Evaluate against active rules sorted by priority
-          const sortedRules = [...db.rules].sort((a, b) => a.priority - b.priority);
-          let matchedRule = null;
+          // Evaluate against Global Reply Config
+          const globalConfig = db.workspace?.settings?.globalReplyConfig || {
+            replyToAll: false,
+            tags: "",
+            template: "Thank you for commenting!"
+          };
 
-          for (const rule of sortedRules) {
-            if (!rule.isActive) continue;
+          let isMatch = false;
 
-            const isMatch = rule.operator === "OR" 
-              ? rule.conditions.some((c) => matchesCondition(text, c.type, c.value))
-              : rule.conditions.every((c) => matchesCondition(text, c.type, c.value));
-
-            if (isMatch) {
-              matchedRule = rule;
-              break;
-            }
+          if (globalConfig.replyToAll) {
+            isMatch = true;
+          } else if (globalConfig.tags.trim().length > 0) {
+            const tags = globalConfig.tags.split(",").map(t => t.trim().toLowerCase()).filter(Boolean);
+            isMatch = tags.some(tag => commentTextLower.includes(tag));
           }
 
-          if (matchedRule) {
+          if (isMatch) {
             matchedCount++;
 
             // Check if user limit is reached
@@ -197,7 +149,7 @@ export async function GET(req: NextRequest) {
                 videoThumbnail,
                 publishedAt,
                 status: "failed",
-                matchedRuleId: matchedRule.id,
+                matchedRuleId: "global",
                 delayRemainingSeconds: 0,
                 autoReplyText: "Daily reply quota limit reached for this account.",
                 replyFiredAt: null
@@ -206,73 +158,13 @@ export async function GET(req: NextRequest) {
               continue;
             }
 
-            // Find Template and interpolate variables
-            const template = db.templates.find((t) => t.id === matchedRule?.templateId);
-            if (!template) {
-              console.error(`Template ${matchedRule.templateId} not found for rule ${matchedRule.name}`);
-              continue;
-            }
-
-            // Generate reply body with all personalization tokens supported
-            let replyText = template.body
+            let replyText = globalConfig.template
               .replace(/\{\{commenter_name\}\}/g, author)
               .replace(/\{\{video_title\}\}/g, videoTitle)
               .replace(/\{\{channel_name\}\}/g, channel.name)
-              .replace(/\{\{reply_date\}\}/g, new Date().toLocaleDateString())
-              .replace(/\{\{custom_variable_1\}\}/g, matchedRule.customVariable1 || "")
-              .replace(/\{\{custom_variable_2\}\}/g, matchedRule.customVariable2 || "")
-              .replace(/\{\{custom_variable_3\}\}/g, matchedRule.customVariable3 || "");
+              .replace(/\{\{reply_date\}\}/g, new Date().toLocaleDateString());
 
-            // Hold in Review if rule is configured for review first
-            if ((matchedRule.approvalMode || "review") === "review") {
-              const reviewComment: DBComment = {
-                id: commentId,
-                channelId: channel.id,
-                author,
-                authorAvatar,
-                authorSubscribers: "0",
-                authorHistoryCount: 0,
-                text,
-                videoTitle,
-                videoThumbnail,
-                publishedAt,
-                status: "review",
-                matchedRuleId: matchedRule.id,
-                delayRemainingSeconds: 0,
-                autoReplyText: replyText,
-                replyFiredAt: null
-              };
-              db.comments.unshift(reviewComment);
-              await logActivity("System", `Comment by ${author} held in review queue. Rule: '${matchedRule.name}'`);
-              continue;
-            }
-
-            // Handle Humanization Delay if > 0
-            if (matchedRule.delaySeconds > 0) {
-              const delayedComment: DBComment = {
-                id: commentId,
-                channelId: channel.id,
-                author,
-                authorAvatar,
-                authorSubscribers: "0",
-                authorHistoryCount: 0,
-                text,
-                videoTitle,
-                videoThumbnail,
-                publishedAt,
-                status: "matched",
-                matchedRuleId: matchedRule.id,
-                delayRemainingSeconds: matchedRule.delaySeconds,
-                autoReplyText: replyText,
-                replyFiredAt: null,
-                matchedAt: new Date().toISOString()
-              };
-              db.comments.unshift(delayedComment);
-              await logActivity("System", `Comment by ${author} matched rule '${matchedRule.name}'. Queued for humanization delay (${Math.round(matchedRule.delaySeconds / 60)}m)`);
-              continue;
-            }
-
-            // Post Reply immediately (delaySeconds === 0 and autonomous mode)
+            // Post Reply immediately
             const ytResponse = await postCommentReply(channel.id, commentId, replyText);
 
             if (ytResponse) {
@@ -280,10 +172,6 @@ export async function GET(req: NextRequest) {
               activeUser.repliesToday++;
               repliedCount++;
               
-              // Increment usage counter on template
-              const tplIdx = db.templates.findIndex((t) => t.id === template.id);
-              if (tplIdx >= 0) db.templates[tplIdx].usageCount++;
-
               // Save success entry in local DB
               const successComment: DBComment = {
                 id: commentId,
@@ -297,13 +185,13 @@ export async function GET(req: NextRequest) {
                 videoThumbnail,
                 publishedAt,
                 status: "replied",
-                matchedRuleId: matchedRule.id,
+                matchedRuleId: "global",
                 delayRemainingSeconds: 0,
                 autoReplyText: replyText,
                 replyFiredAt: new Date().toISOString()
               };
               db.comments.unshift(successComment);
-              await logActivity("System", `Auto-replied immediately to ${author}. Rule: '${matchedRule.name}'`);
+              await logActivity("System", `Auto-replied immediately to ${author} using Global Settings`);
             } else {
               // Mark comment check as failed
               const failedComment: DBComment = {
@@ -318,7 +206,7 @@ export async function GET(req: NextRequest) {
                 videoThumbnail,
                 publishedAt,
                 status: "failed",
-                matchedRuleId: matchedRule.id,
+                matchedRuleId: "global",
                 delayRemainingSeconds: 0,
                 autoReplyText: "Failed to post comment to YouTube API. Check credentials or network connectivity.",
                 replyFiredAt: null

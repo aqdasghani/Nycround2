@@ -40,6 +40,12 @@ export interface WorkspaceMember {
   avatar: string;
 }
 
+export interface GlobalReplyConfig {
+  replyToAll: boolean;
+  tags: string;
+  template: string;
+}
+
 export interface WorkspaceSettings {
   dailyReplyQuota: number;
   blockedUsers: string[];
@@ -47,6 +53,7 @@ export interface WorkspaceSettings {
   slackWebhook: string;
   emailDigest: string;
   negativeKeywords?: string;
+  globalReplyConfig?: GlobalReplyConfig;
 }
 
 export interface Workspace {
@@ -211,6 +218,15 @@ export async function getDB(customEmail?: string): Promise<DBData> {
           dirty = true;
         }
 
+        if (parsed.workspace?.settings && !parsed.workspace.settings.globalReplyConfig) {
+          parsed.workspace.settings.globalReplyConfig = {
+            replyToAll: false,
+            tags: "",
+            template: "Thank you for commenting!"
+          };
+          dirty = true;
+        }
+
         const todayStr = new Date().toISOString().split("T")[0];
         if (parsed.userSession.lastResetDate !== todayStr) {
           parsed.userSession.repliesToday = 0;
@@ -226,7 +242,8 @@ export async function getDB(customEmail?: string): Promise<DBData> {
       } else {
         // Document not found in Mongo, seed default structure
         const defaultData: DBData = {
-          workspace: { name: email ? `${email.split("@")[0].charAt(0).toUpperCase() + email.split("@")[0].slice(1)}'s Workspace` : "My Workspace", members: [], settings: { dailyReplyQuota: 500, blockedUsers: [], spamProtection: true, slackWebhook: "", emailDigest: "weekly", negativeKeywords: "scam, refund, disappointed, hate, fake, bot, report" } },
+          
+        workspace: { name: email ? `${email.split("@")[0].charAt(0).toUpperCase() + email.split("@")[0].slice(1)}'s Workspace` : "My Workspace", members: [], settings: { dailyReplyQuota: 500, blockedUsers: [], spamProtection: true, slackWebhook: "", emailDigest: "weekly", negativeKeywords: "scam, refund, disappointed, hate, fake, bot, report", globalReplyConfig: { replyToAll: false, tags: "", template: "Thank you for commenting!" } } },
           channels: [],
           templates: [],
           rules: [],
@@ -256,7 +273,7 @@ export async function getDB(customEmail?: string): Promise<DBData> {
 
     if (!fs.existsSync(customDbPath)) {
       const defaultData: DBData = {
-        workspace: { name: email ? `${email.split("@")[0].charAt(0).toUpperCase() + email.split("@")[0].slice(1)}'s Workspace` : "My Workspace", members: [], settings: { dailyReplyQuota: 500, blockedUsers: [], spamProtection: true, slackWebhook: "", emailDigest: "weekly", negativeKeywords: "scam, refund, disappointed, hate, fake, bot, report" } },
+        workspace: { name: email ? `${email.split("@")[0].charAt(0).toUpperCase() + email.split("@")[0].slice(1)}'s Workspace` : "My Workspace", members: [], settings: { dailyReplyQuota: 500, blockedUsers: [], spamProtection: true, slackWebhook: "", emailDigest: "weekly", negativeKeywords: "scam, refund, disappointed, hate, fake, bot, report", globalReplyConfig: { replyToAll: false, tags: "", template: "Thank you for commenting!" } } },
         channels: [],
         templates: [],
         rules: [],
@@ -299,6 +316,15 @@ export async function getDB(customEmail?: string): Promise<DBData> {
       dirty = true;
     }
 
+    if (parsed.workspace?.settings && !parsed.workspace.settings.globalReplyConfig) {
+      parsed.workspace.settings.globalReplyConfig = {
+        replyToAll: false,
+        tags: "",
+        template: "Thank you for commenting!"
+      };
+      dirty = true;
+    }
+
     const todayStr = new Date().toISOString().split("T")[0];
     if (parsed.userSession.lastResetDate !== todayStr) {
       parsed.userSession.repliesToday = 0;
@@ -314,7 +340,7 @@ export async function getDB(customEmail?: string): Promise<DBData> {
   } catch (err) {
     console.error("Failed to read DB file:", err);
     return {
-      workspace: { name: "Error Workspace", members: [], settings: { dailyReplyQuota: 100, blockedUsers: [], spamProtection: true, slackWebhook: "", emailDigest: "weekly", negativeKeywords: "scam, refund, disappointed, hate, fake, bot, report" } },
+      workspace: { name: "Error Workspace", members: [], settings: { dailyReplyQuota: 100, blockedUsers: [], spamProtection: true, slackWebhook: "", emailDigest: "weekly", negativeKeywords: "scam, refund, disappointed, hate, fake, bot, report", globalReplyConfig: { replyToAll: false, tags: "", template: "Thank you for commenting!" } } },
       channels: [],
       templates: [],
       rules: [],

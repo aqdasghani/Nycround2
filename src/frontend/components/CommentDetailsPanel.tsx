@@ -46,15 +46,12 @@ export default function CommentDetailsPanel() {
 
   const [comment, setComment] = useState<Comment | null>(null);
   const [replyText, setReplyText] = useState("");
-  const [loadingAI, setLoadingAI] = useState(false);
-  const [aiDetails, setAIDetails] = useState<{ confidence: number; model: string } | null>(null);
 
   // Load comment details when selectedCommentId changes
   useEffect(() => {
     async function loadComment() {
       if (!selectedCommentId) {
         setComment(null);
-        setAIDetails(null);
         return;
       }
       try {
@@ -110,54 +107,7 @@ export default function CommentDetailsPanel() {
     }
   };
 
-  const handleSuggestReply = async () => {
-    if (!comment) return;
-    setLoadingAI(true);
-    setAIDetails(null);
-    
-    try {
-      // Find variables from the matched rule to pass to suggestor
-      let customVars = { cv1: "", cv2: "", cv3: "" };
-      if (comment.matchedRuleId) {
-        const ruleRes = await fetch(`/api/rules/${comment.matchedRuleId}`);
-        if (ruleRes.ok) {
-          const rule = await ruleRes.json();
-          customVars = {
-            cv1: rule.customVariable1 || "",
-            cv2: rule.customVariable2 || "",
-            cv3: rule.customVariable3 || ""
-          };
-        }
-      }
 
-      const res = await fetch("/api/ai/suggest-reply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          commentText: comment.text,
-          authorName: comment.author,
-          customVariable1: customVars.cv1,
-          customVariable2: customVars.cv2,
-          customVariable3: customVars.cv3
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setReplyText(data.suggestion);
-        setAIDetails({
-          confidence: data.confidence,
-          model: data.model
-        });
-        showToast("AI suggestion generated!", "success");
-      }
-    } catch (err) {
-      console.error("Error fetching AI suggestion:", err);
-      showToast("Failed to fetch AI suggestion", "error");
-    } finally {
-      setLoadingAI(false);
-    }
-  };
 
   return (
     <AnimatePresence>
@@ -264,26 +214,6 @@ export default function CommentDetailsPanel() {
                   <span className="text-[10px] font-semibold uppercase text-slate-400 block tracking-wider">
                     Draft Response
                   </span>
-                  
-                  {comment.status !== "replied" && (
-                    <button
-                      disabled={loadingAI}
-                      onClick={handleSuggestReply}
-                      className="inline-flex items-center gap-1 text-[10px] font-semibold text-google-blue bg-blue-50 hover:bg-blue-100/80 px-2.5 py-1 border border-blue-200 rounded-full transition active:scale-95 disabled:opacity-50"
-                    >
-                      {loadingAI ? (
-                        <>
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                          Claude is thinking...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="h-3 w-3" />
-                          AI Suggest Reply
-                        </>
-                      )}
-                    </button>
-                  )}
                 </div>
 
                 <div className="relative">
@@ -295,14 +225,6 @@ export default function CommentDetailsPanel() {
                     disabled={comment.status === "replied"}
                     className="w-full rounded-xl border border-slate-200 p-3.5 text-xs outline-none focus:border-google-blue focus:ring-2 focus:ring-google-blue/15 font-sans leading-relaxed resize-none disabled:bg-slate-50 disabled:text-slate-500"
                   />
-                  
-                  {/* AI Metadata details tag */}
-                  {aiDetails && (
-                    <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5 rounded-md bg-green-50 border border-green-200 px-2 py-0.5 text-[9px] text-green-700 font-semibold animate-fade-in">
-                      <Sparkles className="h-2.5 w-2.5 text-accent-success" />
-                      <span>{aiDetails.confidence}% Confidence ({aiDetails.model})</span>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
