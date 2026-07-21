@@ -67,11 +67,6 @@ export default function Sidebar() {
 
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Live Feed", href: "/dashboard/feed", icon: MessageSquare },
-    { name: "Rule Builder", href: "/dashboard/rules", icon: Sliders },
-    { name: "Templates", href: "/dashboard/templates", icon: FolderHeart },
-    { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ];
 
   return (
