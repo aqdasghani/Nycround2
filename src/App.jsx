@@ -46,7 +46,7 @@ function App() {
         <div className='bg-yellow-300 rounded-3xl m-1.5 w-[97.5vw] h-[75vh] md:h-[40vh] lg:h-[90vh]'>
           <div className='w-full flex justify-center pt-8'>
 
-            <nav className='hidden md:block navbar mx-auto bg-white rounded-full p-2 px-4 shadow-lg'>
+            <nav className='hidden md:flex justify-center navbar mx-auto bg-white rounded-full p-2 px-4 shadow-lg'>
 
               <div className='flex justify-between gap-10 items-center'>
                 <div className='heading-font text-xl font-bold cursor-pointer'>QuickReply</div>
@@ -68,10 +68,12 @@ function App() {
 
 
             </nav>
+          </div>
 
 
 
-            <div className='md:hidden flex justify-between items-center gap-40 px-6 py-5'>
+          <div className='md:hidden'>
+            <div className=' flex justify-between font-black items-center gap-40 px-6 py-5'>
               <h2 className='text-2xl font-bold heading-font'>QuickReply</h2>
 
               <button onClick={() => setmenuOpen(!menuOpen)}>
@@ -80,34 +82,29 @@ function App() {
 
             </div>
 
+            {menuOpen && (
 
+              <div className={`md:hidden overflow-hidden bg-white transition-all duration-300 ${menuOpen ? "max-h-96 opacity-100" : 'max-h-0 opacity-0'
+                }`}>
 
-            <div className={`'md:hidden overflow-hidden transition-all duration-300 ${menuOpen ? "max-h-96 opacity-100" : 'max-h-0 opacity-0'
-              }'`}>
+                <div className='bg-white rounded-2xl mx-3 p-3'>
+                  <ul className='flex flex-col gap-5 text-lg font-medium'>
+                    <li> <a href='#home' className='text-sm font-semibold body-font'>Home</a></li>
+                    <li> <a href='#capabilites' className='text-sm font-semibold body-font'>Capabilities</a></li>
 
-              <div className='bg-white rounded-2xl mx-3 p-3'>
-                <ul className='flex flex-col gap-5 text-lg font-medium'>
-                  <li> <a href='#home' className='text-sm font-semibold body-font'>Home</a></li>
-                  <li> <a href='#about' className='text-sm font-semibold body-font'>About Us</a></li>
-                  <li> <a href='#why' className='text-sm font-semibold body-font'>Why Us</a></li>
-                  <li> <a href='#faq' className='text-sm font-semibold body-font'>FAQ</a></li>
+                    <li> <a href='#faq' className='text-sm font-semibold body-font'>FAQ</a></li>
 
-                  <button className='bg-black cursor-pointer text-white px-5 py-2 rounded-full'>Get Started<a /></button>
+                    <button className='bg-black cursor-pointer text-white px-5 py-2 rounded-full'>Get Started<a /></button>
 
-                </ul>
+                  </ul>
+                </div>
               </div>
 
-
-
-            </div >
-
-
-
+            )}
 
 
 
           </div >
-
 
 
           <div className='herosection = grid grid-cols-1  md:grid-cols-2 gap-20 items-center px-10 py-16'>
@@ -179,7 +176,7 @@ function App() {
         </section >
 
 
-        <section id='about' className='py-20 px-10'>
+        <section id='capabilities' className='py-20 px-10'>
 
           <div className='text-center mb-5'>
             <h1 className='text-zinc-900 heading-font text-4xl font-bold italic'>It's capabilites?</h1>
