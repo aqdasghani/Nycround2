@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Local Netlify folder
 .netlify
+
+# google credentials
+client_secret_*.json
