@@ -5,8 +5,11 @@ import heroImg from './assets/hero.png'
 import './App.css'
 import younggirl from './assets/younggirl.jpg'
 
+import { useNavigate } from 'react-router-dom'
+
 function App() {
   const [count, setCount] = useState(0)
+  const navigate = useNavigate()
 
   return (
     <>
@@ -18,8 +21,12 @@ function App() {
               <li>About</li>
               <li>Contact</li>
               <li>
-                <button className='bg-black text-white px-5 py-2 rounded-full'>Get Started</button>
-
+                <button 
+                  onClick={() => navigate('/login')} 
+                  className='bg-black text-white px-5 py-2 rounded-full cursor-pointer hover:bg-gray-800'
+                >
+                  Get Started
+                </button>
               </li>
             </ul>
           </nav>
