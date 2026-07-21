@@ -224,7 +224,7 @@ export default function LiveCommentFeed() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 rounded-full bg-red-50 border border-red-200 px-3 py-1 font-semibold text-accent-live text-xs">
             <span className="h-2 w-2 rounded-full bg-accent-live live-pulse" />
-            <span>● LIVE ACTIVITY</span>
+            <span>LIVE ACTIVITY</span>
           </div>
         </div>
 
@@ -380,8 +380,8 @@ export default function LiveCommentFeed() {
 
                       {/* Timer count down */}
                       {comment.status === "matched" && comment.delayRemainingSeconds > 0 && (
-                        <div className="flex items-center gap-1 font-bold text-accent-live bg-red-50 border border-red-200 rounded px-2 py-0.5 live-pulse">
-                          <Clock className="h-3 w-3 text-accent-live" />
+                        <div className="flex items-center gap-1 font-bold text-accent-live bg-red-50 border border-red-200 rounded px-2 py-0.5">
+                          <Clock className="h-3 w-3 text-accent-live live-pulse" />
                           <span>Dispatching in {formatTimer(comment.delayRemainingSeconds)}</span>
                         </div>
                       )}
