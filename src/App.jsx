@@ -43,7 +43,7 @@ function App() {
   return (
     <>
       <div className='bg-amber-100'>
-        <div className='bg-yellow-300 rounded-3xl m-1.5 w-[97.5vw] h-[75vh] md:h-[40vh] lg:h-[90vh]'>
+        <div className='bg-yellow-300 m-0 w-full h-[75vh] md:h-[40vh] lg:h-[90vh]'>
           <div className='w-full flex justify-center pt-8'>
 
             <nav className='hidden md:flex justify-center navbar mx-auto bg-white rounded-full p-2 px-4 shadow-lg'>
@@ -107,7 +107,7 @@ function App() {
           </div >
 
 
-          <div className='herosection = grid grid-cols-1  md:grid-cols-2 gap-20 items-center px-10 py-16'>
+          <div className='herosection grid grid-cols-1  md:grid-cols-2 gap-20 items-center px-10 py-16'>
             <div className='left-div flex flex-col gap-6'>
               <h1 className='heading-font text-4xl font-bold italic text-zinc-900 leading-none' >Meet QuickReply !</h1>
               <p className='text-lg text-zinc-900 leading-6 max-w-xl body-font'>
