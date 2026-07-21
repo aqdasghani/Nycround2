@@ -8,6 +8,7 @@ import { Clock3, MessageCircle, Zap } from 'lucide-react'
 import { Bot } from 'lucide-react'
 import { ChevronDown } from 'lucide-react'
 
+
 function App() {
 
 
@@ -15,9 +16,9 @@ function App() {
 
   const faqs = [
     {
-      question: "How does ReplyFlow work?",
+      question: "How does QuickReply work?",
       answer:
-        "Create keyword rules, and ReplyFlow automatically replies whenever a matching YouTube comment is detected.",
+        "Create keyword rules, and QuickReply automatically replies whenever a matching YouTube comment is detected.",
     },
     {
       question: "Can I customize my replies?",
@@ -30,7 +31,7 @@ function App() {
         "Yes. You can connect and manage multiple creator channels from one dashboard.",
     },
     {
-      question: "Is ReplyFlow free?",
+      question: "Is QuickReply free?",
       answer:
         "Our hackathon version is completely free to use.",
     },
@@ -42,6 +43,9 @@ function App() {
       <div className='bg-amber-100'>
         <div className='bg-yellow-300 rounded-3xl m-1.5 w-[97vw] h-[97.5vh]'>
           <div className='w-full flex justify-center pt-8'>
+
+            {/* <div>Quick Reply</div> */}
+
             <nav className='navbar bg-white rounded-full p-2 px-4 shadow-lg'>
               <ul className='flex gap-16 w-full items-center cursor-pointer'>
                 <li className='text-sm font-semibold'>Home</li>
@@ -195,7 +199,7 @@ function App() {
                   className='border-b border-gray-200 py-5 cursor-pointer'
                   onClick={() =>
                     setOpenIndex(openIndex === index ? null : index)}
-                    >
+                >
 
                   <div className='flex justify-between items-center'>
                     <h3 className='text-lg font-semibold'> {faq.question}</h3>
@@ -230,7 +234,52 @@ function App() {
 
 
 
-        <footer></footer>
+        <footer className='bg-black py-8 px-2'>
+          <div className='max-w-5xl mx-auto grid grid-cols-3 gap-16 px-10 text-white'>
+
+
+            <div className='flex flex-col gap-3'>
+              <h2 className='text-3xl font-bold text-white heading-font'>QuickReply</h2>
+              <p className='text-white text-sm'>
+                Automate YouTube comment replies and save hours every week.
+              </p>
+
+              <div className='flex justify-between items-center gap-4 text-white mt-8'>
+                <h1 className='text-sm cursor-pointer'>Twitter</h1>
+                <h1 className='text-sm cursor-pointer'>Linkedin</h1>
+                <h1 className='text-sm cursor-pointer'>Instagram</h1>
+                <h1 className='text-sm cursor-pointer'>Github</h1>
+              </div>
+            </div>
+
+
+
+            <div>
+              <h3 className='font-bold text-lg'>Product</h3>
+
+              <ul className='space-y-4 mt-6 text-white'>
+                <li className='tex-sm cursor-pointer'>Features</li>
+                <li className='tex-sm cursor-pointer'>FAQ</li>
+                <li className='tex-sm cursor-pointer'>Documentation</li>
+
+              </ul>
+            </div>
+
+
+            <div>
+              <h3 className='font-bold text-lg'>Company</h3>
+
+              <ul className='space-y-4 mt-6 text-white'>
+                <li className='text-sm cursor-pointer'>About Us</li>
+                <li className='text-sm cursor-pointer'>Contact Us</li>
+
+              </ul>
+            </div>
+
+
+
+          </div>
+        </footer>
 
 
 
