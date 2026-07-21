@@ -115,20 +115,64 @@ export async function GET(req: NextRequest) {
             continue;
           }
 
-          // Evaluate against Global Reply Config
-          const globalConfig = db.workspace?.settings?.globalReplyConfig || {
-            replyToAll: false,
-            tags: "",
-            template: "Thank you for commenting!"
-          };
+          // Evaluate against Rules (priority ordered)
+          const activeRules = [...(db.rules || [])].filter(r => r.isActive).sort((a, b) => a.priority - b.priority);
+          
+          let matchedRule = null;
+          
+          for (const rule of activeRules) {
+            const checkCond = (c: any) => {
+              if (c.type === "reply_all") return true;
+              const v = c.value?.toLowerCase().trim();
+              if (!v) return false;
+              if (c.type === "contains") return commentTextLower.includes(v);
+              if (c.type === "equals") return commentTextLower === v;
+              if (c.type === "starts_with") return commentTextLower.startsWith(v);
+              return false;
+            };
 
-          let isMatch = false;
+            const isRuleMatch = rule.operator === "OR"
+              ? rule.conditions.some(checkCond)
+              : rule.conditions.every(checkCond);
 
-          if (globalConfig.replyToAll) {
-            isMatch = true;
-          } else if (globalConfig.tags.trim().length > 0) {
-            const tags = globalConfig.tags.split(",").map(t => t.trim().toLowerCase()).filter(Boolean);
-            isMatch = tags.some(tag => commentTextLower.includes(tag));
+            if (isRuleMatch) {
+              matchedRule = rule;
+              break;
+            }
+          }
+          
+          let isMatch = !!matchedRule;
+          let replyTextTemplate = "Thank you for commenting!";
+          let matchedRuleId = matchedRule ? matchedRule.id : null;
+          let customVar1 = "";
+          let customVar2 = "";
+          let customVar3 = "";
+
+          if (isMatch && matchedRule) {
+            const matchedTemplate = db.templates?.find((t: any) => t.id === matchedRule.templateId);
+            if (matchedTemplate) replyTextTemplate = matchedTemplate.body;
+            customVar1 = matchedRule.customVariable1 || "";
+            customVar2 = matchedRule.customVariable2 || "";
+            customVar3 = matchedRule.customVariable3 || "";
+          } else {
+             // Fallback to global config if no rules matched
+             const globalConfig = db.workspace?.settings?.globalReplyConfig || {
+               replyToAll: false,
+               tags: "",
+               template: "Thank you for commenting!"
+             };
+             if (globalConfig.replyToAll) {
+               isMatch = true;
+               replyTextTemplate = globalConfig.template;
+               matchedRuleId = "global";
+             } else if (globalConfig.tags.trim().length > 0) {
+               const tags = globalConfig.tags.split(",").map(t => t.trim().toLowerCase()).filter(Boolean);
+               if (tags.some(tag => commentTextLower.includes(tag))) {
+                 isMatch = true;
+                 replyTextTemplate = globalConfig.template;
+                 matchedRuleId = "global";
+               }
+             }
           }
 
           if (isMatch) {
@@ -158,11 +202,14 @@ export async function GET(req: NextRequest) {
               continue;
             }
 
-            let replyText = globalConfig.template
+            let replyText = replyTextTemplate
               .replace(/\{\{commenter_name\}\}/g, author)
               .replace(/\{\{video_title\}\}/g, videoTitle)
               .replace(/\{\{channel_name\}\}/g, channel.name)
-              .replace(/\{\{reply_date\}\}/g, new Date().toLocaleDateString());
+              .replace(/\{\{reply_date\}\}/g, new Date().toLocaleDateString())
+              .replace(/\{\{custom_variable_1\}\}/g, customVar1)
+              .replace(/\{\{custom_variable_2\}\}/g, customVar2)
+              .replace(/\{\{custom_variable_3\}\}/g, customVar3);
 
             // Post Reply immediately
             const ytResponse = await postCommentReply(channel.id, commentId, replyText);
@@ -185,7 +232,7 @@ export async function GET(req: NextRequest) {
                 videoThumbnail,
                 publishedAt,
                 status: "replied",
-                matchedRuleId: "global",
+                matchedRuleId: matchedRuleId || "global",
                 delayRemainingSeconds: 0,
                 autoReplyText: replyText,
                 replyFiredAt: new Date().toISOString()
@@ -206,7 +253,7 @@ export async function GET(req: NextRequest) {
                 videoThumbnail,
                 publishedAt,
                 status: "failed",
-                matchedRuleId: "global",
+                matchedRuleId: matchedRuleId || "global",
                 delayRemainingSeconds: 0,
                 autoReplyText: "Failed to post comment to YouTube API. Check credentials or network connectivity.",
                 replyFiredAt: null

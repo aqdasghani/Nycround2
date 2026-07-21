@@ -171,8 +171,10 @@ export default function RulesListPage() {
     }
 
     const matchesCondition = (text: string, type: string, value: string): boolean => {
+      if (type === "reply_all") return true;
       const t = text.toLowerCase();
-      const v = value.toLowerCase();
+      const v = value.toLowerCase().trim();
+      if (!v) return false;
       if (type === "contains") return t.includes(v);
       if (type === "equals") return t === v;
       if (type === "starts_with") return t.startsWith(v);
@@ -305,7 +307,7 @@ export default function RulesListPage() {
                           key={c.id}
                           className="bg-slate-100 border border-slate-150 rounded px-2 py-0.5 text-[10px] font-mono font-medium text-slate-650"
                         >
-                          {c.type === "starts_with" ? "Starts:" : ""}{c.value}
+                          {c.type === "reply_all" ? "Every Comment" : c.type === "starts_with" ? `Starts: ${c.value}` : c.value}
                         </span>
                       ))}
                       {rule.conditions.length > 1 && (

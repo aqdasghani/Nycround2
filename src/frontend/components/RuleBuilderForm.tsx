@@ -20,7 +20,7 @@ import {
 
 interface Condition {
   id: string;
-  type: "contains" | "equals" | "starts_with";
+  type: "contains" | "equals" | "starts_with" | "reply_all";
   value: string;
 }
 
@@ -190,6 +190,7 @@ export default function RuleBuilderForm({ ruleId }: RuleBuilderFormProps) {
         comments.slice(0, 10).forEach((comment: any) => {
           const textLower = comment.text.toLowerCase();
           const matches = conditions.map((cond) => {
+            if (cond.type === "reply_all") return true;
             const condVal = cond.value.toLowerCase().trim();
             if (!condVal) return false;
             
@@ -199,7 +200,7 @@ export default function RuleBuilderForm({ ruleId }: RuleBuilderFormProps) {
             return false;
           });
 
-          if (matches.length === 0 || conditions.every(c => !c.value.trim())) {
+          if (matches.length === 0 || (conditions.every(c => c.type !== "reply_all" && !c.value.trim()))) {
             results[comment.id] = false;
           } else if (operator === "AND") {
             results[comment.id] = matches.every(m => m);
@@ -234,7 +235,7 @@ export default function RuleBuilderForm({ ruleId }: RuleBuilderFormProps) {
         name: ruleName || "Unnamed Rule",
         isActive,
         colorLabel,
-        conditions: conditions.filter(c => c.value.trim() !== ""),
+        conditions: conditions.filter(c => c.type === "reply_all" || c.value.trim() !== ""),
         operator,
         filters: {
           topLevelOnly,
@@ -418,20 +419,23 @@ export default function RuleBuilderForm({ ruleId }: RuleBuilderFormProps) {
                   <option value="contains">Keyword / Phrase</option>
                   <option value="equals">Exact match</option>
                   <option value="starts_with">Starts with</option>
+                  <option value="reply_all">Reply to every comment</option>
                 </select>
 
                 <div className="text-xs font-medium text-slate-500">
-                  {cond.type === "contains" ? "contains" : cond.type === "starts_with" ? "starts with" : "equals"}
+                  {cond.type === "contains" ? "contains" : cond.type === "starts_with" ? "starts with" : cond.type === "reply_all" ? "" : "equals"}
                 </div>
 
-                <input
-                  type="text"
-                  required
-                  value={cond.value}
-                  onChange={(e) => updateConditionValue(cond.id, e.target.value)}
-                  placeholder="e.g. price"
-                  className="flex-1 min-w-[150px] max-w-xs rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-mono outline-none focus:border-google-blue"
-                />
+                {cond.type !== "reply_all" && (
+                  <input
+                    type="text"
+                    required
+                    value={cond.value}
+                    onChange={(e) => updateConditionValue(cond.id, e.target.value)}
+                    placeholder="e.g. price"
+                    className="flex-1 min-w-[150px] max-w-xs rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-mono outline-none focus:border-google-blue"
+                  />
+                )}
 
                 <button
                   type="button"
